@@ -23,7 +23,8 @@
 #
 
 import radiusd
-from OCIControl import Client
+import logging
+import OCIControl
 
 
 hostname = ''
@@ -38,7 +39,7 @@ def log(level, s):
 
 def instantiate():
     global client
-    client = Client(url=hostname, username=username, password=password)
+    client = OCIControl.Client(url=hostname, username=username, password=password)
     try:
         client.login()
     except Exception as e:
@@ -46,16 +47,22 @@ def instantiate():
 
 
 def authorize():
-    pass
+    return radiusd.RLM_MODULE_OK
 
 
 def authenticate(authData):
-    if authData.type == 'AccessDeviceMACAddress':
-        pass
-    if authData.type == 'AccessDeviceName':
-        pass
-    if authData.type == 'UserId':
-        pass
+    key, value = authData
+    if key == 'AccessDeviceMACAddress':
+        logger.info("AccessDeviceMACAddress")
+        return radiusd.RLM_MODULE_OK
+    if key == 'AccessDeviceName':
+        logger.info("AccessDeviceName")
+        return radiusd.RLM_MODULE_OK
+    if key == 'UserId':
+        logger.info("UserId")
+        return radiusd.RLM_MODULE_OK
+
+    return radiusd.RLM_MODULE_OK
 
 
 def preacct():
@@ -64,7 +71,7 @@ def preacct():
 
 def accounting(acctData):
     # Details returned from Broadworks to stamp in accounting log
-    pass
+    return radiusd.RLM_MODULE_OK
 
 
 def detach():
@@ -75,4 +82,11 @@ def detach():
 
 
 if __name__ == '__main__':
-    pass
+    log_level = logging.INFO
+    logger = logging.getLogger('freeradius Broadworks')
+    logger.setLevel(log_level)
+    ch = logging.StreamHandler()
+    ch.setLevel(log_level)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)

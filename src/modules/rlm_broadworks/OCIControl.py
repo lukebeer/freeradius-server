@@ -19,12 +19,13 @@
 #
 # $Id$
 
-import cgi
-import hashlib
-import HTMLParser
-import httplib2
-import random
+
 import re
+import cgi
+import random
+import hashlib
+import httplib2
+import HTMLParser
 
 
 class OCISchemaDataTypes:
@@ -162,7 +163,7 @@ class Client(OCIBuilder):
         self._set_session_id()
 
     def _set_session_id(self):
-        self._session_id = abs(random.randrange(0,1000000000000000000))
+        self._session_id = abs(random.randrange(0, 1000000000000))
 
     def _get_session_id(self):
         if self._session_id is None:
@@ -217,15 +218,16 @@ class Client(OCIBuilder):
     def login(self):
         if self.authenticate():
             pw = hashlib.sha1()
-            pw.update(self._nonce)
+            pw.update(self._password)
             sha1pw = pw.hexdigest()
             spw = hashlib.md5()
             spw.update("%s:%s" % (self._nonce, sha1pw))
             self._request_body = OCIBuilder().build(OCISchemaLogin().LoginRequest14sp4(self._username, spw.hexdigest()), self._session_id)
+            print self._request_body
             self._submit_request()
             if self._response.status == 200:
                 body = self.decode_body(self._response_body)
-                return True
+                return body
             raise Exception("%s: %s" % self._response.status)
 
     def decode_body(self, body):
