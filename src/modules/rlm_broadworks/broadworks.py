@@ -46,11 +46,7 @@ def instantiate():
         log(radiusd.L_ERR, str(e))
 
 
-def authorize():
-    return radiusd.RLM_MODULE_OK
-
-
-def authenticate(authData):
+def authorize(authData):
     key, value = authData
     if key == 'AccessDeviceMACAddress':
         logger.info("AccessDeviceMACAddress")
@@ -62,6 +58,10 @@ def authenticate(authData):
         logger.info("UserId")
         return radiusd.RLM_MODULE_OK
 
+    return radiusd.RLM_MODULE_OK
+
+
+def authenticate():
     return radiusd.RLM_MODULE_OK
 
 
